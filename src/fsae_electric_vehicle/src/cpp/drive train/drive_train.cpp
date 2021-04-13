@@ -18,10 +18,11 @@ int main(int argc, char **argv) {
   ros::Rate loop_rate(100);
   //std::cout << "listening" << std::endl;
 
-  float x = 0;
+  float x = 6;
 
   while (ros::ok()) {
     drivetrain.voltage = x;
+    x += .5;
     x+=static_cast <float> (rand()) / static_cast <float> (RAND_MAX); //simulation
     drivetrain_msg.publish(drivetrain);
     ros::spinOnce();

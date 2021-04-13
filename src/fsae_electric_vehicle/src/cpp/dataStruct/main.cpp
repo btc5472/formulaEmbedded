@@ -69,7 +69,7 @@ struct data
 // }
 
 // void speedCallback(const fsae_electric_vehicle::speedometer::ConstPtr& msg) {
-//      std::lock_guard<std::mutex> lock{dataMutex};
+//     std::lock_guard<std::mutex> lock{dataMutex};
 //      std::memcpy(&data[2], &msg->speed, 4);
 
 // void printStruct(const struct data& d)
