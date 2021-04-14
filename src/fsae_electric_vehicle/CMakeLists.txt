@@ -31,11 +31,25 @@ add_message_files(FILES
 
 generate_messages(DEPENDENCIES std_msgs)
 
-catkin_package(CATKIN_DEPENDS message_runtime)
+catkin_package(
+	INCLUDE_DIRS socket.io-client-cpp
+	CATKIN_DEPENDS message_runtime)
 
 include_directories(
+  socket.io-client-cpp
   ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
+
+add_library(${PROJECT_NAME} socket.io-client-cpp/src/sio_client.cpp socket.io-client-cpp/src/sio_socket.cpp socket.io-client-cpp/src/internal/sio_client_impl.cpp socket.io-client-cpp/src/internal/sio_packet.cpp)
+
+
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    socket.io-client-cpp/src 
+    socket.io-client-cpp/lib/websocketpp 
+    socket.io-client-cpp/lib/rapidjson/include
+)
+
 
 add_executable(DriveTrain src/cpp/drivetrain/drive_train.cpp src/cpp/drivetrain/CANController.cpp)
 target_link_libraries(DriveTrain ${catkin_LIBRARIES})
@@ -52,20 +66,15 @@ target_link_libraries(Brakes ${catkin_LIBRARIES})
 target_compile_features(Brakes PUBLIC cxx_std_17)
 add_dependencies(Brakes fsae_electric_vehicle_generate_messages_cpp)
 
-add_executable(SocketSender src/cpp/socketsender/main.cpp)
-target_link_libraries(SocketSender ${catkin_LIBRARIES})
-target_compile_features(SocketSender PUBLIC cxx_std_17)
-add_dependencies(SocketSender fsae_electric_vehicle_generate_messages_cpp)
+add_executable(SocketIOSender src/cpp/SocketIOSender/main.cpp)
+target_link_libraries(SocketIOSender ${catkin_LIBRARIES} ${PROJECT_NAME} )
+target_compile_features(SocketIOSender PUBLIC cxx_std_17)
+add_dependencies(SocketIOSender fsae_electric_vehicle_generate_messages_cpp)
 
 add_executable(SPEEDOMETER src/cpp/speedometer/main.cpp)
 target_link_libraries(SPEEDOMETER ${catkin_LIBRARIES})
 target_compile_features(SPEEDOMETER PUBLIC cxx_std_17)
 add_dependencies(SPEEDOMETER fsae_electric_vehicle_generate_messages_cpp)
-
-add_executable(DataStruct src/cpp/dataStruct/main.cpp)
-target_link_libraries(DataStruct ${catkin_LIBRARIES})
-target_compile_features(DataStruct PUBLIC cxx_std_17)
-add_dependencies(DataStruct fsae_electric_vehicle_generate_messages_cpp)
 
 catkin_install_python(
   PROGRAMS
@@ -79,7 +88,7 @@ catkin_install_python(
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS SocketSender
+install(TARGETS SocketIOSender
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -99,9 +108,7 @@ install(TARGETS DriveTrain
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS DataStruct
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+
 
 message("Bin Dir is ${CATKIN_PACKAGE_BIN_DESTINATION}")
 
@@ -114,3 +121,4 @@ install (FILES
   src/launch/main.launch
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+

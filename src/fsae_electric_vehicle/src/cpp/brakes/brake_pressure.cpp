@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     if (data.has_value()) {
       std::memcpy(&lastVal, data->data, 4);
     }
+    lastVal += .5;
     brake_pressure.pressure = lastVal;
     brake_pressure_msg.publish(brake_pressure);
     ros::spinOnce();

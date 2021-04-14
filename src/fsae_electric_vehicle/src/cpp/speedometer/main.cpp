@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 #include "fsae_electric_vehicle/speedometer.h"
-
 int main(int argc, char **argv) {
   ros::init(argc, argv, "SPEEDOMETER");
   ros::NodeHandle n;
@@ -9,7 +8,7 @@ int main(int argc, char **argv) {
 
   fsae_electric_vehicle::speedometer speedometer;
 
-  ros::Rate loop_rate{5};
+  ros::Rate loop_rate{30};
   std::cout << "Init!" << std::endl;
 
   float x = 0;

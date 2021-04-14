@@ -23,13 +23,14 @@ int main(int argc, char **argv) {
   ros::Rate loop_rate(5);
   std::cout << "listening" << std::endl;
 
-  float lastVal = 0;
+  float lastVal = 60;
 
   while (ros::ok()) {
     auto data = can.getData(0x0A080F03, 0x1FFFFFFF);
     if (data.has_value()) {
       std::memcpy(&lastVal, data->data, 4);
     }
+    lastVal += .3;
     temperature.temperature = lastVal;
     coolant_msg.publish(temperature);
     ros::spinOnce();

@@ -22,13 +22,14 @@ int main(int argc, char **argv) {
   CANController can;
   can.start("can0");
 
-  float lastVal = 0;
+  float lastVal = 20;
 
   while (ros::ok()) {
     auto data = can.getData(0x02051881, 0x1FFFFFFF);
     if (data.has_value()) {
       std::memcpy(&lastVal, data->data, 4);
     }
+    lastVal += .1;
     drivetrain.voltage = lastVal;
     drivetrain_msg.publish(drivetrain);
     ros::spinOnce();
