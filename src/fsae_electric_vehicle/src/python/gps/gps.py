@@ -5,7 +5,7 @@
 # Topics Publishing: gps_data
 # Summary:
 #     The purpose of this node is to read latitude and longitude data
-#     from the Sierra Wireless MC7455 Modem
+#     from the Adafruit Ultimate GPS (Old GPS used to be Sierra Wireless MC7455 Modem)
 # Related:
 #     MC7455 Compatible Drivers: (https://source.sierrawireless.com/resources/airprime/software/usb-drivers-linux-qmi-software-latest/)
 #     Configurations were set up using Minicom using AT Commands
