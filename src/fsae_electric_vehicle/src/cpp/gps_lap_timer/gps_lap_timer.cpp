@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "CANController.h"
+#include <fsae_electric_vehicle/gps.h> // This gps.h is actually referencing the gps.msg file in the msg folder. I dont know why its like this but it wont compile without it
 #include "gps_timer.h"   // our header
 #include "utility.h"     // utility functions
 #include "gps.h"         // gps specific functions
@@ -11,11 +12,11 @@
 #include <cassert>
 #include <math.h>
 #include <array>
-#include <conio.h>       // for _kbhit() and _getchar()
+//#include <conio.h> // for _kbhit() and _getchar()
 
 #define _CRT_SECURE_NO_WARNINGS
 
-static void Prepend(Char*, const char*);
+static void Prepend(char*, const char*);
 static void DisplayTime(const uint8_t, const float);
 static float EstablishStartLine(char *tokens[]);
 static void Run(float timeStamp, char *tokens[]);
@@ -29,16 +30,18 @@ int main(int argc, char **argv) {
   ros::NodeHandle n;
   //std::cout << "After node handle calling ros::start()" << std::endl;
 
-  ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps_lap_timer>("gps_lap_timer", 1000);
+  ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps>("gps_lap_timer", 1000);
   //std::cout << "After gps_lap_timer_pub" << std::endl;
 
-  fsae_electric_vehicle::gps_lap_timer gps_lap_timer; //constructor
+  fsae_electric_vehicle::gps gps_lap_timer; //constructor
 
   ros::Rate loop_rate(50);
   //std::cout << "listening gps_lap_timer" << std::endl;
 
+#ifndef FILE_INPUT
   CANController can;
   can.start("can0");
+#endif
 
   float lastVal = 0;
   
@@ -48,7 +51,7 @@ int main(int argc, char **argv) {
   while (ros::ok()) { // This loop and the while loop ~15 lines below wont work together. Fix it
 #ifdef FILE_INPUT
 	// Attempt to open gps data file
-	if (fopen_s(&file, filePath, "r")) {
+	if (fopen(filePath, "r")) {
 		printf("-----------ERROR OPENING FILE-----------\n");
 		exit(-1);
 	}
@@ -63,20 +66,11 @@ int main(int argc, char **argv) {
 	std::cout << "\nGPS status active!\nAwaiting keypress to establish startline.";
 	while (1){
 		if (GetRMCSentence(gpsTokens)) {
-
-#ifdef FILE_INPUT
-			if (getchar())
-#else
-			if (_kbhit()) // Non-blocking. Chk if keyboard key is pressed
-#endif
-			{
-				std::cout << std::endl;
-				float ts = EstablishStartLine(gpsTokens);
-
-				if (ts != 0.0f) {
-					Run(ts, gpsTokens); // Port wont be used here
-					break;
-				}
+			std::cout << std::endl; // Add code here to pause StartLine generation until button push
+			float ts = EstablishStartLine(gpsTokens);
+			if (ts != 0.0f) {
+				Run(ts, gpsTokens); // Port wont be used here
+				break;
 			}
 		}
 	}
@@ -89,7 +83,7 @@ int main(int argc, char **argv) {
 	
     //lastVal += .5;
     //brake_pressure.pressure = lastVal;
-    gps_lap_timer_pub.publish(gpsTokens[]);
+    //gps_lap_timer_pub.publish(gpsTokens[]);
     ros::spinOnce();
     loop_rate.sleep();
   }
@@ -199,7 +193,7 @@ static void Run(float timeStamp, char *tokens[])
 	// Main gps string processing loop.
 	while (1)
 	{
-		if (!GetRMCSentence(port, tokens)) // Port wont be used here
+		if (!GetRMCSentence(tokens))
 		{
 
 #ifdef FILE_INPUT

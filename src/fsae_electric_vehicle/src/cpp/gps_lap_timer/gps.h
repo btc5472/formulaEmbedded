@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <stdio.h>
 #include "gps_timer.h"
-#include "serial_port.h"
 
 static bool Checksum(char* sentence)
 {
@@ -103,7 +102,7 @@ std::array<unsigned char, 16> gpsDisableGSV = { 0xB5, 0x62, 0x06, 0x01, 0x08, 0x
 std::array<unsigned char, 16> gpsDisableVTG = { 0xB5, 0x62, 0x06, 0x01, 0x08, 0x00, 0xF0, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x05, 0x47 }; // GxVTG off
 std::array<unsigned char, 32> gpsBaud19200 = { "$PUBX,41,1,0007,0003,19200,0*25" }; // 19200 baud rate
 
-static void gpsSetup(const PORT p)
+/*static void gpsSetup(const PORT p)
 {
 	assert(p != NULL);
 
@@ -114,6 +113,6 @@ static void gpsSetup(const PORT p)
 	SendData(p, &gpsDisableVTG[0], gpsDisableVTG.size()); // Disable VTG.
 	SendData(p, &gpsUpdateRate[0], gpsUpdateRate.size()); // Set update rate at 5Hz.
 	//SendData(p, &gpsBaud19200[0], gpsBaud19200.size()); // Set 19200 baud rate.
-}
+}*/
 
 #endif

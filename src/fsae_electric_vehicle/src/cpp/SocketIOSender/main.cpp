@@ -21,7 +21,7 @@
   
   std::mutex dataMutex;
 
-  void speedCallback(const fsae_electric_vehicle::speedometer::ConstPtr& msg){
+  void speedCallback(const fsae_electric_vehicle::speedometer::ConstPtr& msg) {
  	std::lock_guard<std::mutex> lock{dataMutex};
  	memcpy(&speedVal, &msg->speed, sizeof(speedVal)+1);
  }

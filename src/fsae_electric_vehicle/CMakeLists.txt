@@ -76,17 +76,29 @@ target_link_libraries(SPEEDOMETER ${catkin_LIBRARIES})
 target_compile_features(SPEEDOMETER PUBLIC cxx_std_17)
 add_dependencies(SPEEDOMETER fsae_electric_vehicle_generate_messages_cpp)
 
+add_executable(gps_lap_timer src/cpp/gps_lap_timer/gps_lap_timer.cpp)
+target_link_libraries(gps_lap_timer ${catkin_LIBRARIES})
+target_compile_features(gps_lap_timer PUBLIC cxx_std_17)
+add_dependencies(gps_lap_timer fsae_electric_vehicle_generate_messages_cpp)
+
+########################## These are old python files ############################
+#
+# This reader.py is for reading all data being published (except gps data) and outputting it
+#
 catkin_install_python(
-  PROGRAMS
+ PROGRAMS
   src/python/reader/reader.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
+#
+# This gps.py is for reading GPS data being published and outputting it 
+#
 catkin_install_python(
   PROGRAMS
   src/python/gps/gps.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+##################################################################################
 
 install(TARGETS SocketIOSender
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -107,6 +119,11 @@ install(TARGETS CoolantTemp
 install(TARGETS DriveTrain
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+# This doesnt seen to do anything
+#install(TARGETS gps_lap_timer
+#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#)
 
 
 

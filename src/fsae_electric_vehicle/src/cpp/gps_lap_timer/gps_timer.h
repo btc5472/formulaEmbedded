@@ -139,7 +139,7 @@ err error;
 const char* filePath = "data.txt";
 FILE* file = NULL;
 bool FILE_INPUT_EOF = false;
-PORT port = nullptr;
+//PORT port = nullptr;
 #endif
 
 #endif
