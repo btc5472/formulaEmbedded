@@ -12,7 +12,7 @@
 #include <cassert>
 #include <math.h>
 #include <array>
-//#include <conio.h> // for _kbhit() and _getchar()
+
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -37,6 +37,8 @@ int main(int argc, char **argv) {
 
   ros::Rate loop_rate(50);
   //std::cout << "listening gps_lap_timer" << std::endl;
+
+  //Use ROS_INFO for printf-style logging, and ROS_INFO_STREAM for cout-style logging
 
 #ifndef FILE_INPUT
   CANController can;

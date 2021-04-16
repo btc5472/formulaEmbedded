@@ -1,8 +1,8 @@
 {
-  "ros.distro": "melodic",
+  "ros.distro": "noetic",
   "python.autoComplete.extraPaths": [
-    "C:/opt/ros/melodic/x64\\lib/site-packages",
-    "C:\\Users\\thadh\\Documents\\ros\\devel\\lib\\site-packages"
+    "C:/opt/ros/noetic/x64\\lib/site-packages",
+    "C:\\Users\\btc54\\Documents\\ros\\devel\\lib\\site-packages"
   ],
   "files.associations": {
     "algorithm": "cpp",
