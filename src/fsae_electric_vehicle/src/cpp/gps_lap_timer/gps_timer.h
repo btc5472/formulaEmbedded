@@ -47,7 +47,7 @@ static constexpr float PROJECTION_DISTANCE{ 100.0f };
 
 // Maximum possible characters in a GPS string (+ fudge).
 const std::size_t GPS_STRING_LENGTH = 80;
-// Serial/file input buffer.
+// File input buffer.
 char buffer[GPS_STRING_LENGTH];
 
 // Lap time class.
@@ -136,7 +136,7 @@ err error;
 #define FILE_INPUT
 
 #ifdef FILE_INPUT
-const char* filePath = "data.txt";
+const char* filePath = "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/src/cpp/gps_lap_timer/data.txt";
 FILE* file = NULL;
 bool FILE_INPUT_EOF = false;
 //PORT port = nullptr;

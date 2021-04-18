@@ -38,12 +38,16 @@ static bool GetRMCSentence(char* tokens[])
 	error.Clear();
 
 #ifdef FILE_INPUT
-
-	if (fgets(buffer, GPS_STRING_LENGTH, file) == NULL)
-	{
-		error.SetError(err::ID::FILE_EOF);
-		return false;
+	std::cout << "before fgets func";
+	if (fgets(buffer, GPS_STRING_LENGTH, file) == NULL) {
+		std::cout << "Cannot read file into buffer. gps.h----\n";
 	}
+	//if (fgets(buffer, GPS_STRING_LENGTH, file) == NULL)
+	//{
+		//std::cout << "In fgets";
+		//error.SetError(err::ID::FILE_EOF);
+		//return false;
+	//}
 
 #else
 	// *******************Read data from CANBUS****************

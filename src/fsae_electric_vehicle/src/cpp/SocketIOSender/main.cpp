@@ -6,8 +6,8 @@
 #include "fsae_electric_vehicle/coolant.h"
 #include "fsae_electric_vehicle/drive_train.h"
 #include "fsae_electric_vehicle/gps.h"
-#//include "/home/faizan/catkin_ws/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" //Change to directory where the header file is at or it won't compile
-#include <sio_client.h>
+#include "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" //Change to directory where the header file is at or it won't compile
+//#include <sio_client.h>
 #include <string>
 #include <mutex>
 //#include <socket.io-client-cpp/src/sio_client.h>

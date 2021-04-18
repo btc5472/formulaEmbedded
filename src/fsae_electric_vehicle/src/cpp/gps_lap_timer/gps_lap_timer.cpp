@@ -13,8 +13,9 @@
 #include <math.h>
 #include <array>
 
-
 #define _CRT_SECURE_NO_WARNINGS
+
+//Use ROS_INFO for printf-style logging, and ROS_INFO_STREAM for cout-style logging
 
 static void Prepend(char*, const char*);
 static void DisplayTime(const uint8_t, const float);
@@ -22,74 +23,81 @@ static float EstablishStartLine(char *tokens[]);
 static void Run(float timeStamp, char *tokens[]);
 
 int main(int argc, char **argv) {
-  //std::cout << "Starting gps_lap_timer" << std::endl;
+	//std::cout << "Starting gps_lap_timer" << std::endl;
 
-  ros::init(argc, argv, "gps_lap_timer");
-  //std::cout << "initialized gps_lap_timer node" << std::endl;
+	ros::init(argc, argv, "gps_lap_timer");
+  	//std::cout << "initialized gps_lap_timer node" << std::endl;
 
-  ros::NodeHandle n;
-  //std::cout << "After node handle calling ros::start()" << std::endl;
+ 	ros::NodeHandle n;
+ 	//std::cout << "After node handle calling ros::start()" << std::endl;
 
-  ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps>("gps_lap_timer", 1000);
-  //std::cout << "After gps_lap_timer_pub" << std::endl;
+  	ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps>("gps_lap_timer", 1000);
+ 	//std::cout << "After gps_lap_timer_pub" << std::endl;
 
-  fsae_electric_vehicle::gps gps_lap_timer; //constructor
+  	fsae_electric_vehicle::gps gps_lap_timer; //constructor
 
-  ros::Rate loop_rate(50);
-  //std::cout << "listening gps_lap_timer" << std::endl;
+  	ros::Rate loop_rate(50);
+  	//std::cout << "listening gps_lap_timer" << std::endl;
 
-  //Use ROS_INFO for printf-style logging, and ROS_INFO_STREAM for cout-style logging
+ 	float lastVal = 0;
+ 	char* gpsTokens[RMC_CHECKSUM + 1]; // Pointer to gps rmc (string) fields
 
-#ifndef FILE_INPUT
-  CANController can;
-  can.start("can0");
-#endif
-
-  float lastVal = 0;
-  
-  // Pointer to gps rmc (string) fields
-  char* gpsTokens[RMC_CHECKSUM + 1];
-
-  while (ros::ok()) { // This loop and the while loop ~15 lines below wont work together. Fix it
 #ifdef FILE_INPUT
 	// Attempt to open gps data file
-	if (fopen(filePath, "r")) {
+	file = fopen(filePath, "r");
+	std::cout << "after open file";
+	if (file == NULL) {
 		printf("-----------ERROR OPENING FILE-----------\n");
+		ROS_INFO("-----------ERROR OPENING FILE 2-----------\n");
 		exit(-1);
 	}
+	//fgets(buffer, GPS_STRING_LENGTH, file);
+	//std::cout << buffer[0];
 #else
-	auto data = can.getData(0x02051884, 0x1FFFFFFF); // First param is idFilter and its probably wrong for reading gps data
-	if (data.has_value()) {
-		std::memcpy(&gpsTokens, data->data, RMC_CHECKSUM + 1);
-	}
+  	CANController can; // Start the CABUS header on the Jetson/Quasar board
+	can.start("can0");
+	// Wait for GPS fix
+	do {
+		// Nothing
+	} while (!GetRMCSentence(gpsTokens));
+#endif
+	  
+
+  	while (ros::ok()) { // This loop and the while loop ~15 lines below wont work together. Fix it
+#ifdef FILE_INPUT
+#else
+		auto data = can.getData(0x02051884, 0x1FFFFFFF); // First param is idFilter and its probably wrong for reading gps data
+		if (data.has_value()) {
+			std::memcpy(&gpsTokens, data->data, RMC_CHECKSUM + 1);
+		}
 #endif
 
-	// Establish startline
-	std::cout << "\nGPS status active!\nAwaiting keypress to establish startline.";
-	while (1){
-		if (GetRMCSentence(gpsTokens)) {
-			std::cout << std::endl; // Add code here to pause StartLine generation until button push
-			float ts = EstablishStartLine(gpsTokens);
-			if (ts != 0.0f) {
-				Run(ts, gpsTokens); // Port wont be used here
-				break;
+		// Establish startline
+		std::cout << "\nGPS status active!\nAwaiting keypress to establish startline.";
+		//while (1){
+			if (GetRMCSentence(gpsTokens)) {
+				//std::cout << std::endl; // Add code here to pause StartLine generation until button push
+				float ts = EstablishStartLine(gpsTokens);
+				if (ts != 0.0f) {
+					Run(ts, gpsTokens);
+					break;
+				}
 			}
-		}
-	}
+		//}
 	
 #ifdef FILE_INPUT
-	// Close file
-	if (file)
-		fclose(file);
+		// Close file
+		if (file)
+			fclose(file);
 #endif
 	
-    //lastVal += .5;
-    //brake_pressure.pressure = lastVal;
-    //gps_lap_timer_pub.publish(gpsTokens[]);
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
-}
+    	//lastVal += .5;
+    	//brake_pressure.pressure = lastVal;
+   		//gps_lap_timer_pub.publish(gpsTokens[]);
+    	ros::spinOnce();
+   		loop_rate.sleep();
+  	} // while
+} // main
 
 
 
