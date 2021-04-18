@@ -17,11 +17,11 @@ int main(int argc, char **argv) {
 
   ros::Rate loop_rate(5);
   std::cout << "listening" << std::endl;
-`
+
   float x = 0;
 
   while (ros::ok()) {
-    suspension.voltage = x;
+    suspension.frontLeft = x;
     x+=static_cast <float> (rand()) / static_cast <float> (RAND_MAX); //simulation
     suspension_msg.publish(suspension);
     ros::spinOnce();

@@ -19,7 +19,7 @@ static bool Checksum(char* sentence)
 	return (crc == n);
 }
 
-// Parse gps string.
+// Parse gps string into tokens
 static size_t ParseRMC(char* sentence, char* tokens[])
 {
 	assert(sentence != nullptr);
@@ -40,7 +40,7 @@ static bool GetRMCSentence(char* tokens[])
 #ifdef FILE_INPUT
 	std::cout << "before fgets func";
 	if (fgets(buffer, GPS_STRING_LENGTH, file) == NULL) {
-		std::cout << "Cannot read file into buffer. gps.h----\n";
+		std::cout << "Cannot read file into buffer. Func = GetRMCSentence(). File = gps.h----\n";
 	}
 	//if (fgets(buffer, GPS_STRING_LENGTH, file) == NULL)
 	//{
@@ -48,10 +48,11 @@ static bool GetRMCSentence(char* tokens[])
 		//error.SetError(err::ID::FILE_EOF);
 		//return false;
 	//}
-
 #else
-	// *******************Read data from CANBUS****************
-	
+	auto data = can.getData(0x02051884, 0x1FFFFFFF); // First param is idFilter and its probably wrong for reading gps data
+	if (data.has_value()) { // If data isnt empty then copy data into 'buffer' array
+		std::memcpy(&buffer, data->data, RMC_CHECKSUM + 1);
+	}
 #endif
 
 	// RMC sentence?

@@ -1,9 +1,9 @@
 #include "ros/ros.h"
 #include "CANController.h"
 #include <fsae_electric_vehicle/gps.h> // This gps.h is actually referencing the gps.msg file in the msg folder. I dont know why its like this but it wont compile without it
-#include "gps_timer.h"   // our header
-#include "utility.h"     // utility functions
-#include "gps.h"         // gps specific functions
+#include "gps_timer.h"   // Our header
+#include "utility.h"     // Utility functions
+#include "gps.h"         // GPS specific functions
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -22,24 +22,21 @@ static void DisplayTime(const uint8_t, const float);
 static float EstablishStartLine(char *tokens[]);
 static void Run(float timeStamp, char *tokens[]);
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	//std::cout << "Starting gps_lap_timer" << std::endl;
-
 	ros::init(argc, argv, "gps_lap_timer");
   	//std::cout << "initialized gps_lap_timer node" << std::endl;
 
- 	ros::NodeHandle n;
+	ros::NodeHandle n;
  	//std::cout << "After node handle calling ros::start()" << std::endl;
 
   	ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps>("gps_lap_timer", 1000);
  	//std::cout << "After gps_lap_timer_pub" << std::endl;
 
-  	fsae_electric_vehicle::gps gps_lap_timer; //constructor
-
-  	ros::Rate loop_rate(50);
+  	fsae_electric_vehicle::gps gps_lap_timer; // constructor
   	//std::cout << "listening gps_lap_timer" << std::endl;
 
- 	float lastVal = 0;
  	char* gpsTokens[RMC_CHECKSUM + 1]; // Pointer to gps rmc (string) fields
 
 #ifdef FILE_INPUT
@@ -60,43 +57,44 @@ int main(int argc, char **argv) {
 	do {
 		// Nothing
 	} while (!GetRMCSentence(gpsTokens));
+	std::cout << "\nGPS status active!";
 #endif
-	  
+	
+	// Establish StartLine
+	float ts;
+	if (GetRMCSentence(gpsTokens))
+		ts = EstablishStartLine(gpsTokens);
+	else {
+		std::cout << "Cannot establish startline due to GetRMCSentence\n";
+		ROS_INFO("ROS_INFO Cannot establish startline due to GetRMCSentence\n");
+		exit(-2);
+	}
 
-  	while (ros::ok()) { // This loop and the while loop ~15 lines below wont work together. Fix it
-#ifdef FILE_INPUT
-#else
-		auto data = can.getData(0x02051884, 0x1FFFFFFF); // First param is idFilter and its probably wrong for reading gps data
-		if (data.has_value()) {
-			std::memcpy(&gpsTokens, data->data, RMC_CHECKSUM + 1);
-		}
-#endif
+	ros::Rate loop_rate(30); // Loop rate can be up to 30 times per second 
 
-		// Establish startline
-		std::cout << "\nGPS status active!\nAwaiting keypress to establish startline.";
-		//while (1){
-			if (GetRMCSentence(gpsTokens)) {
-				//std::cout << std::endl; // Add code here to pause StartLine generation until button push
-				float ts = EstablishStartLine(gpsTokens);
-				if (ts != 0.0f) {
-					Run(ts, gpsTokens);
-					break;
-				}
+  	while (ros::ok()) {
+		std::cout << "\nROS is ok!";
+		if (GetRMCSentence(gpsTokens)) { // Receive gps data from file or from CANBUS
+			//std::cout << std::endl; // Add code here to pause StartLine generation until button push
+			if (ts != 0.0f) {
+				Run(ts, gpsTokens);
+				//break;
 			}
-		//}
-	
-#ifdef FILE_INPUT
-		// Close file
-		if (file)
-			fclose(file);
-#endif
-	
-    	//lastVal += .5;
-    	//brake_pressure.pressure = lastVal;
-   		//gps_lap_timer_pub.publish(gpsTokens[]);
+		}
+		gps_lap_timer.time = atof(gpsTokens[1]);
+		gps_lap_timer.latitude = atof(gpsTokens[4]);
+		gps_lap_timer.longitude = atof(gpsTokens[6]);
+		gps_lap_timer.speed = atof(gpsTokens[7]);
+		gps_lap_timer.heading = atof(gpsTokens[8]);
+		gps_lap_timer.magneticVariation = atof(gpsTokens[11]);
+   		gps_lap_timer_pub.publish(gps_lap_timer);
     	ros::spinOnce();
    		loop_rate.sleep();
   	} // while
+#ifdef FILE_INPUT // Close file
+	if (file)
+		fclose(file);
+#endif
 } // main
 
 
@@ -108,7 +106,7 @@ int main(int argc, char **argv) {
 // Prepends s onto d. Assumes d has enough space allocated for the combined string.
 static void Prepend(char* d, const char* s)
 {
-	assert(s != nullptr && d != nullptr);
+	assert(s != nullptr && d != nullptr); 
 	
 	size_t len = strlen(s);
 
@@ -128,11 +126,9 @@ static void DisplayTime(const uint8_t n, const float ft)
 	float fs = ft - (m * 60);
 	sprintf(s1, "%.02d:%05.2f ", m, fs);
 
-	// Prepend lap number.
-	if (n)
+	if (n) // Prepend lap number.
 	{
 		char s2[6];
-
 		sprintf(s2, "%d: ", n);
 		Prepend(s1, s2);
 	}
@@ -145,7 +141,6 @@ static float EstablishStartLine(char *tokens[])
 	float ts;
 
 #ifdef FILE_INPUT
-	
 	// Safeway parking lot: $GPRMC,194924.80,A,3203.02116,N,11042.41425,W,1.304,30.95,120120,,,A*48
 	startPoint.x = (float)32.0302116;
 	startPoint.y = (float)110.4241425;
@@ -154,9 +149,7 @@ static float EstablishStartLine(char *tokens[])
 	// Position timestamp.
 	char t[] = "194924.80";
 	ts = ConvertToSeconds(t);
-
 #else
-
 	if (tokens[RMC_TIME] == nullptr || tokens[RMC_TRACK] == nullptr ||
 	    tokens[RMC_LATITUDE] == nullptr || tokens[RMC_LONGITUDE] == nullptr)
 		return 0.0f;
@@ -173,7 +166,6 @@ static float EstablishStartLine(char *tokens[])
 
 	// Heading while crossing start/finish.
 	startHeading = atoi(tokens[RMC_TRACK]);
-
 #endif
 
 	// Define startline.
@@ -201,8 +193,8 @@ static void Run(float timeStamp, char *tokens[])
 	lapData[numLaps].setStart(timeStamp);
 
 	// Main gps string processing loop.
-	while (1)
-	{
+	//while (1)
+	//{
 		if (!GetRMCSentence(tokens))
 		{
 
@@ -210,14 +202,13 @@ static void Run(float timeStamp, char *tokens[])
 			if (error.GetError() == err::ID::FILE_EOF)
 				return;
 #endif
-
 			std::cout << error.GetDescription() << std::endl;
-			continue;
+			//continue;
 		}
 		else
 			std::cout << clock[++ticToc & 0x01] << '\r';
 
-		// Previous position gps time stamp.
+		// Previous position GPS time stamp.
 		float prevTimeStamp = timeStamp;
 
 		// Confirm sentence is sequential.
@@ -226,7 +217,7 @@ static void Run(float timeStamp, char *tokens[])
 		{
 			error.SetError(err::ID::TIME_STAMP);
 			std::cout << error.GetDescription() << std::endl;
-			continue;
+			//continue;
 		}
 
 		// Get current track position (lat, long).
@@ -240,7 +231,7 @@ static void Run(float timeStamp, char *tokens[])
 			track.p1.y = atof_(temp);
 		}
 		else
-			continue;
+			//continue;
 
 		// Ignore gps sentences for 1 second after crossing start/finish.
 		if (hzCounter < GPS_UPDATE_FREQUENCY)
@@ -250,7 +241,7 @@ static void Run(float timeStamp, char *tokens[])
 			// Prepare for next iteration.
 			track.p0.x = track.p1.x;
 			track.p0.y = track.p1.y;
-			continue;
+			//continue;
 		}
 		
 		// Heading sanity check & check if crossed start/finish line?
@@ -293,5 +284,11 @@ static void Run(float timeStamp, char *tokens[])
 		// Prepare for next iteration.
 		track.p0.x = track.p1.x;
 		track.p0.y = track.p1.y;
-	}
+	//}
 }
+
+/***************************************************** TODO **********************************************************************/
+// This program should publish all data extracted from the RMC string to ROS
+// Should be able to start & end racing sessions
+// Reading data from CANBUS doesnt work. Thats in gps.h in GetRMCSentence()
+// Test and debug this program while connected to Jetson and CANBUS

@@ -1,8 +1,8 @@
-// lap timer header file.
+// Lap timer header file.
 #ifndef _LAP_TIMER_H_
 #define _LAP_TIMER_H_
 
-// msvc
+// MSVC
 #define float double
 
 #define MIN(x, y)                     (((x) < (y)) ? (x) : (y))
@@ -10,7 +10,7 @@
 #define DEGTORAD(deg)                 (deg*57.29577995f)
 #define D_TO_RADIANS                  (PI/180.0f)
 
-// gps rmc sentence fields.
+// GPS rmc sentence fields.
 #define RMC_PREFIX                    0
 #define RMC_TIME                      1
 #define RMC_STATUS                    2
@@ -29,7 +29,7 @@
 #define LATITUDE                      0x01
 #define LONGITUDE                     0x02
 
-// Gps update frequency and period.
+// GPS update frequency and period.
 const std::size_t GPS_UPDATE_FREQUENCY = 5; // Hz.
 static constexpr float GPS_UPDATE_PERIOD{ 1.0f/GPS_UPDATE_FREQUENCY };
 
@@ -42,11 +42,9 @@ static constexpr float LINE_WIDTH{ 50.0f };
 static constexpr float LINE_WIDTH_2{ 25.0f };
 static constexpr float PROJECTION_DISTANCE{ 100.0f };
 
-// Serial port with gps device connected (see device manager).
-//constexpr int comPort{ 5 };
-
 // Maximum possible characters in a GPS string (+ fudge).
 const std::size_t GPS_STRING_LENGTH = 80;
+
 // File input buffer.
 char buffer[GPS_STRING_LENGTH];
 
@@ -130,7 +128,7 @@ private:
 	ID error_;
 };
 
-// Gps errors.
+// GPS errors.
 err error;
 
 #define FILE_INPUT
@@ -139,7 +137,6 @@ err error;
 const char* filePath = "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/src/cpp/gps_lap_timer/data.txt";
 FILE* file = NULL;
 bool FILE_INPUT_EOF = false;
-//PORT port = nullptr;
 #endif
 
 #endif
