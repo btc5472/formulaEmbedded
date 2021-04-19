@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 		exit(-2);
 	}
 
-	ros::Rate loop_rate(30); // Loop rate can be up to 30 times per second 
+	ros::Rate loop_rate(30); // Loop rate can be up to 30 times per second
 
   	while (ros::ok()) {
 		std::cout << "\nROS is ok!";
@@ -91,10 +91,12 @@ int main(int argc, char **argv)
     	ros::spinOnce();
    		loop_rate.sleep();
   	} // while
+
 #ifdef FILE_INPUT // Close file
 	if (file)
 		fclose(file);
 #endif
+
 } // main
 
 
@@ -288,7 +290,7 @@ static void Run(float timeStamp, char *tokens[])
 }
 
 /***************************************************** TODO **********************************************************************/
-// This program should publish all data extracted from the RMC string to ROS
 // Should be able to start & end racing sessions
 // Reading data from CANBUS doesnt work. Thats in gps.h in GetRMCSentence()
 // Test and debug this program while connected to Jetson and CANBUS
+// Vehicle data should be stored locally on the Quasar if there is no connection to the server

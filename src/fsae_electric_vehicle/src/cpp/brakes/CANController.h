@@ -6,6 +6,7 @@
 #include <mutex>
 #include <vector>
 #include <string>
+#include <optional>
 
 struct CANData {
   uint64_t timestamp;
@@ -16,8 +17,8 @@ struct CANData {
 
 };
 
-class CANController {
-public:
+  class CANController {
+  public:
   int start(std::string_view port);
   void stop();
   std::optional<CANData> getData(uint32_t idFilter, uint32_t idMask);

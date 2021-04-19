@@ -49,10 +49,24 @@ static bool GetRMCSentence(char* tokens[])
 		//return false;
 	//}
 #else
-	auto data = can.getData(0x02051884, 0x1FFFFFFF); // First param is idFilter and its probably wrong for reading gps data
-	if (data.has_value()) { // If data isnt empty then copy data into 'buffer' array
-		std::memcpy(&buffer, data->data, RMC_CHECKSUM + 1);
+	float seconds = 0, latitude = 0, longitude = 0, speed = 0, magneticVar = 0, trueCourse = 0;
+
+	auto data = can.getData(0x34, 0x1FFFFFFF); // First param is idFilter
+	if (data.has_value()) {
+		//std::memcpy(&buffer, data->data, RMC_CHECKSUM + 1); //
+		seconds = data->data[0]; // 'seconds' can be later converted into hours:minutes:seconds later if needed
+		latitude = data->data[1];
+		longitude = data->data[2];
+		speed = data->data[3];
+		magneticVar = data->data[4];
+		trueCourse= data->data[5];
 	}
+	
+	//Apply conversions below and store to buffer
+	
+	
+	
+	
 #endif
 
 	// RMC sentence?
