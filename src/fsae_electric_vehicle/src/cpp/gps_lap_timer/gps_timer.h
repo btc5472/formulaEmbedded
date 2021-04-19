@@ -131,7 +131,7 @@ private:
 // GPS errors.
 err error;
 
-#define FILE_INPUT
+//#define FILE_INPUT
 
 #ifdef FILE_INPUT
 const char* filePath = "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/src/cpp/gps_lap_timer/data.txt";

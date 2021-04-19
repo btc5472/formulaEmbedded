@@ -1,9 +1,12 @@
 #ifndef _GPS_H_
 #define _GPS_H_
 
+#include "CANController.h"
 #include <cstdint>
 #include <stdio.h>
 #include "gps_timer.h"
+
+// Header files shoudl not contain function defs, so clean this up. Put the defs in another cpp and use this header file for declarations only.
 
 static bool Checksum(char* sentence)
 {
@@ -50,7 +53,11 @@ static bool GetRMCSentence(char* tokens[])
 	//}
 #else
 	float seconds = 0, latitude = 0, longitude = 0, speed = 0, magneticVar = 0, trueCourse = 0;
-
+	/*********************
+	 * So I think the reason why can.start & can.getData are not defined is because CANController.cpp isnt being compiled into a .o file and therefore cannot be linked. To fix this I think I may have to change my CMake file
+	 * ******************/
+	CANController can; // Start the CABUS header on the Jetson/Quasar board
+	can.start("can0");
 	auto data = can.getData(0x34, 0x1FFFFFFF); // First param is idFilter
 	if (data.has_value()) {
 		//std::memcpy(&buffer, data->data, RMC_CHECKSUM + 1); //

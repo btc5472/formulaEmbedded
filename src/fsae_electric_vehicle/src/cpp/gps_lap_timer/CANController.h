@@ -1,5 +1,4 @@
 #pragma once
-
 #include <thread>
 #include <atomic>
 #include <optional>

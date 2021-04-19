@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include "CANController.h"
-#include <fsae_electric_vehicle/gps.h> // This gps.h is actually referencing the gps.msg file in the msg folder. I dont know why its like this but it wont compile without it
+#include <fsae_electric_vehicle/gps.h> // This gps.h is actually referencing 'gps.msg' file in msg folder. Idk why its like this but it wont compile without it
 #include "gps_timer.h"   // Our header
 #include "utility.h"     // Utility functions
 #include "gps.h"         // GPS specific functions
@@ -51,10 +51,10 @@ int main(int argc, char **argv)
 	//fgets(buffer, GPS_STRING_LENGTH, file);
 	//std::cout << buffer[0];
 #else
-  	CANController can; // Start the CABUS header on the Jetson/Quasar board
-	can.start("can0");
-	// Wait for GPS fix
-	do {
+  	//CANController can; // Start the CABUS header on the Jetson/Quasar board
+	//can.start("can0");
+	
+	do { // Wait for GPS fix
 		// Nothing
 	} while (!GetRMCSentence(gpsTokens));
 	std::cout << "\nGPS status active!";
