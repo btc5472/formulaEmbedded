@@ -53,10 +53,12 @@ int main(int argc, char **argv)
 #else
 	/********** Maybe replace this while loop with a function that waits to save cpu cycles***********/
 	// Wait for GPS fix
-	do {
-		// Nothing
+	/*do {
+		ROS_DEBUG("Waiting for GPS fix!\n");
+		std::cout << "Waiting for GPS fix!\n" << std::endl;
+		//std::cin.get();
 	} while (!GetRMCSentence(gpsTokens));
-	std::cout << "\nGPS status active!";
+	std::cout << "\nGPS status active!";*/
 #endif
 	
 	// Establish StartLine
@@ -67,7 +69,7 @@ int main(int argc, char **argv)
 		error.SetError(err::ID::BAD_SENTENCE);
 		ROS_FATAL("Cannot establish startline due to GetRMCSentence\n");
 		ROS_DEBUG("Cannot establish startline due to GetRMCSentence\n");
-		exit(error.GetError());
+		//exit(error.GetError());
 	}
 
 	ros::Rate loop_rate(30); // This means that loop rate can be up to 30 times per second
@@ -77,22 +79,24 @@ int main(int argc, char **argv)
 		if (GetRMCSentence(gpsTokens)) { // Receive GPS data from file or from CANBUS
 			if (ts != 0.0f) {
 				Run(ts, gpsTokens);
+
+				// Store GPS data 
+				gps_lap_timer.time = atof(gpsTokens[1]);
+				gps_lap_timer.latitude = atof(gpsTokens[4]);
+				gps_lap_timer.longitude = atof(gpsTokens[6]);
+				gps_lap_timer.speed = atof(gpsTokens[7]);
+				gps_lap_timer.heading = atof(gpsTokens[8]);
+				gps_lap_timer.magneticVariation = atof(gpsTokens[11]);
+				gps_lap_timer_pub.publish(gps_lap_timer);
 			}
 		} else {
 			error.SetError(err::ID::BAD_SENTENCE);
 			ROS_FATAL_THROTTLE(1, "RMC sentence was lost!"); // Prints error description once per second
-			ROS_DEBUG_THROTTLE(1, "RMC sentence was lost!");
-			exit(error.GetError());
+			//ROS_DEBUG_THROTTLE(1, "RMC sentence was lost!");
+			//exit(error.GetError());
 		}
 
-		// Store GPS data 
-		gps_lap_timer.time = atof(gpsTokens[1]);
-		gps_lap_timer.latitude = atof(gpsTokens[4]);
-		gps_lap_timer.longitude = atof(gpsTokens[6]);
-		gps_lap_timer.speed = atof(gpsTokens[7]);
-		gps_lap_timer.heading = atof(gpsTokens[8]);
-		gps_lap_timer.magneticVariation = atof(gpsTokens[11]);
-   		gps_lap_timer_pub.publish(gps_lap_timer);
+
 
     	ros::spinOnce();
    		loop_rate.sleep();
@@ -124,9 +128,6 @@ static bool GetRMCSentence(char* tokens[]) {
 	//}
 #else
 	float seconds = 0, latitude = 0, longitude = 0, speed = 0, magneticVar = 0, trueCourse = 0;
-	/*********************
-	 * So I think the reason why can.start & can.getData are not defined is because CANController.cpp isnt being compiled into a .o file and therefore cannot be linked. To fix this I think I may have to change my CMake file
-	 * ******************/
 	CANController can; // Start the CABUS header on the Jetson/Quasar board
 	can.start("can0");
 	auto data = can.getData(0x34, 0x1FFFFFFF); // First param is idFilter
