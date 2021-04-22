@@ -35,24 +35,24 @@
 struct point_t { float x, y; };
 struct line_t { point_t p0, p1; };
 
-static float EstablishStartLine(char *tokens[]);
-static void Run(float timeStamp, char *tokens[]);
-static float Distance(const point_t t1, const point_t t2);
-static void IntersectPoint(const point_t p1, const point_t p2, point_t* i);
-static bool LineIntersection(const line_t track);
-static void StartLine(const float sx, const float sy, const float shdg);
-static bool GetRMCSentence(char* tokens[]);
-static float atof_(char s[]);
-static char* strtok_(char* str, const char* delim);
-static char hex(const char ch);
-static float ConvertToSeconds(char* time);
-static bool Equal(float a, float b);
-static bool Within30(const uint16_t a, const uint16_t h);
-static void GeoCopy(const char* s, char* d, const unsigned char value);
-static void Prepend(char* d, const char* s);
-static size_t ParseRMC(char* sentence, char* tokens[]);
-static bool Checksum(char* sentence);
-static void DisplayTime(const uint8_t n, const float ft);
+static float EstablishStartLine(char *[]);
+static void Run(float, char *[]);
+static float Distance(const point_t, const point_t);
+static void IntersectPoint(const point_t, const point_t, point_t*);
+static bool LineIntersection(const line_t);
+static void StartLine(const float, const float, const float);
+static bool GetRMCSentence(char* []);
+static float atof_(char []);
+static char* strtok_(char*, const char*);
+static char hex(const char);
+static float ConvertToSeconds(char*);
+static bool Equal(float, float);
+static bool Within30(const uint16_t , const uint16_t);
+static void GeoCopy(const char*, char*, const unsigned char);
+static void Prepend(char*, const char*);
+static size_t ParseRMC(char*, char* []);
+static bool Checksum(char*);
+static void DisplayTime(const uint8_t, const float);
 
 
 
@@ -75,8 +75,7 @@ static constexpr float PROJECTION_DISTANCE{ 100.0f };
 // Maximum possible characters in a GPS string (+ fudge).
 const std::size_t GPS_STRING_LENGTH = 80;
 
-// File input buffer.
-char buffer[GPS_STRING_LENGTH];
+
 
 // Lap time class.
 struct lap
@@ -129,14 +128,7 @@ private:
 	float stop;
 };
 
-// Coordinate of start/finish location.
-point_t startPoint;
-// Startline endpoints.
-line_t startingLine;
-// Heading crossing start/finish.
-uint16_t startHeading;
-// Coordinates of current & previous GPS location.
-line_t track;
+
 
 // Error descriptions.
 static const char* description[] = { "NO ERROR",  "CHECKSUM FAILURE", "INVALID SENTENCE", "NO FIX", "NON-SEQUENTIAL SENTENCE", "END OF FILE" };
@@ -156,8 +148,6 @@ private:
 	ID error_;
 };
 
-// GPS errors.
-err error;
 
 //#define FILE_INPUT
 
@@ -166,5 +156,3 @@ const char* filePath = "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_ve
 FILE* file = NULL;
 bool FILE_INPUT_EOF = false;
 #endif
-
-

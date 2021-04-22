@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
+
 project(fsae_electric_vehicle)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+## add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -43,12 +45,12 @@ include_directories(
 
 add_library(${PROJECT_NAME} socket.io-client-cpp/src/sio_client.cpp socket.io-client-cpp/src/sio_socket.cpp socket.io-client-cpp/src/internal/sio_client_impl.cpp socket.io-client-cpp/src/internal/sio_packet.cpp)
 
-
 target_include_directories(${PROJECT_NAME} PUBLIC 
     socket.io-client-cpp/src 
     socket.io-client-cpp/lib/websocketpp 
     socket.io-client-cpp/lib/rapidjson/include
 )
+
 
 
 add_executable(DriveTrain src/cpp/drivetrain/drive_train.cpp src/cpp/drivetrain/CANController.cpp)
@@ -91,7 +93,7 @@ add_dependencies(gps_lap_timer fsae_electric_vehicle_generate_messages_cpp)
 #  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)
 #
-# This gps.py is for reading GPS data being published and outputting it 
+# This gps.py is for reading GPS data being published and outputting it
 #
 #catkin_install_python(
 #  PROGRAMS
@@ -99,6 +101,8 @@ add_dependencies(gps_lap_timer fsae_electric_vehicle_generate_messages_cpp)
 #  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)
 ##################################################################################
+
+
 
 install(TARGETS SocketIOSender
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -120,12 +124,9 @@ install(TARGETS DriveTrain
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# This doesnt seen to do anything
-#install(TARGETS gps_lap_timer
-#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
-
-
+install(TARGETS gps_lap_timer
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 message("Bin Dir is ${CATKIN_PACKAGE_BIN_DESTINATION}")
 
