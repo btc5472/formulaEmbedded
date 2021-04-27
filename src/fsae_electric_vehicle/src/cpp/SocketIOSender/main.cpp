@@ -6,9 +6,9 @@
 #include "fsae_electric_vehicle/coolant.h"
 #include "fsae_electric_vehicle/drive_train.h"
 #include "fsae_electric_vehicle/gps.h"
-//#include "/home/nvidia/Desktop/formulaEmbedded-2020/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" //Change to directory where the header file is at or it won't compile. Seth & Faizan you can add your include that is specific to your computers directory, just make sure all of the other includes for sio_client.h are commented out.
+#include "/home/nvidia/Desktop/formulaEmbedded/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" //Change to directory where the header file is at or it won't compile. Seth & Faizan you can add your include that is specific to your computers directory, just make sure all of the other includes for sio_client.h are commented out.
 //#include <sio_client.h>
-#include "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" 
+//#include "/home/btc54/Desktop/formulaEmbedded/src/fsae_electric_vehicle/socket.io-client-cpp/src/sio_client.h" 
 #include <string>
 #include <mutex>
 //#include <socket.io-client-cpp/src/sio_client.h>

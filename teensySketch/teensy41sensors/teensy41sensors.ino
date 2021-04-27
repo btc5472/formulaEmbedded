@@ -23,11 +23,10 @@
 #define GPSSerial Serial2 // Hardware serial port
 
 static CAN_message_t canMsg;
-//static uint8_t hex[1] = "0123456789abcdef";
 const int X_pin = 23;               // Analog pin connected to X output
 const int Y_pin = 22;               // Analog pin connected to Y output
-float mapX = 0;
-float mapY = 0;
+//float mapX = 0;
+//float mapY = 0;
 uint32_t timer = millis();
 const int ledPin =  LED_BUILTIN;    // The pin number for LED
 int ledState = LOW;                 // ledState used to set the LED
@@ -47,8 +46,8 @@ void setup(void)
   pinMode(ledPin, OUTPUT); // Set the digital pin as output:
   Serial.begin(9600);
   Serial.println("Adafruit GPS basic test!");
-  //canbus.begin();
-  //canbus.setBaudRate(500000); // This value has to match the baud rate on the Quasar/Jetson TX2 board
+  canbus.begin();
+  canbus.setBaudRate(500000); // This value has to match the baud rate on the Quasar/Jetson TX2 board
   //pinMode(2, OUTPUT); digitalWrite(2, LOW);
   
   GPS.begin(9600); // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
@@ -138,7 +137,7 @@ void loop(void) {
     }
   }
   
-    canMsg.flags.extended = random(0,2);
+    canMsg.flags.extended = 0; // = random(0,2);
     canMsg.flags.remote = 0;
     canMsg.len = 8;
     canMsg.id = 0x34;
@@ -149,14 +148,27 @@ void loop(void) {
     canMsg.buf[4] = GPS.longitude;
     canMsg.buf[5] = GPS.speed;
     canMsg.buf[6] = GPS.magvariation; 
-    canMsg.buf[7] = GPS.angle; //angle is mentioned as course in Adafruit lib header files
-
+    canMsg.buf[7] = GPS.angle; // Angle is mentioned as course in Adafruit lib header files
 
     canbus.read(canMsg);
-    Serial.print("CAN bus 0: "); hexDump(8, canMsg.buf);
-    Serial.print(" ID: 0x"); Serial.print(canMsg.id, HEX);
-    Serial.write('\r');
-    Serial.write('\n');
+    
+    canSniff(); // Print out the data contained in canMsg
+
+    // This is the output of the can frame displayed in the serial monitor
+    //  MB 0  OVERRUN: 0  LEN: 8 EXT: 0 TS: 0 ID: 34 Buffer: 4 6 28 58 47 0 0 3E 
 
     canbus.write(canMsg);
+}
+
+void canSniff() {
+    Serial.print("MB "); Serial.print(canMsg.mb);
+    Serial.print("  OVERRUN: "); Serial.print(canMsg.flags.overrun);
+    Serial.print("  LEN: "); Serial.print(canMsg.len);
+    Serial.print(" EXT: "); Serial.print(canMsg.flags.extended);
+    Serial.print(" TS: "); Serial.print(canMsg.timestamp);
+    Serial.print(" ID: "); Serial.print(canMsg.id, HEX);
+    Serial.print(" Buffer: ");
+    for ( uint8_t i = 0; i < canMsg.len; i++ ) {
+      Serial.print(canMsg.buf[i], HEX); Serial.print(" ");
+    } Serial.println();
 }

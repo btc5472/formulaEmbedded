@@ -32,6 +32,8 @@ err error;
 
 int main(int argc, char **argv)
 {
+	std::cout << "In glt main\n" << std::endl;
+	ROS_INFO("In glt main\n");
 	ros::init(argc, argv, "gps_lap_timer");
 	ros::NodeHandle n;
   	ros::Publisher gps_lap_timer_pub = n.advertise<fsae_electric_vehicle::gps>("gps_lap_timer", 1000);
@@ -53,12 +55,12 @@ int main(int argc, char **argv)
 #else
 	/********** Maybe replace this while loop with a function that waits to save cpu cycles***********/
 	// Wait for GPS fix
-	/*do {
+	do {
 		ROS_DEBUG("Waiting for GPS fix!\n");
-		std::cout << "Waiting for GPS fix!\n" << std::endl;
-		//std::cin.get();
+		std::cout << "Waiting for GPS fix! c\n" << std::endl;
+		std::cin.get();
 	} while (!GetRMCSentence(gpsTokens));
-	std::cout << "\nGPS status active!";*/
+	std::cout << "\nGPS status active!";
 #endif
 	
 	// Establish StartLine
@@ -128,6 +130,7 @@ static bool GetRMCSentence(char* tokens[]) {
 	//}
 #else
 	float seconds = 0, latitude = 0, longitude = 0, speed = 0, magneticVar = 0, trueCourse = 0;
+	//std::cin.get();
 	CANController can; // Start the CABUS header on the Jetson/Quasar board
 	can.start("can0");
 	auto data = can.getData(0x34, 0x1FFFFFFF); // First param is idFilter
